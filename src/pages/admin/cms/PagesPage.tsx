@@ -359,7 +359,7 @@ export const PagesPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={createMutation.isLoading || updateMutation.isLoading}
+                  disabled={createMutation.isPending || updateMutation.isPending}
                   className="btn btn-primary"
                 >
                   {editingPage ? 'Update Page' : 'Create Page'}

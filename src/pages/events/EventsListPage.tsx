@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Users, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { eventsApi } from '../../api/events-projects';
+import { getImageUrl } from '../../utils/helpers';
 
 export default function EventsListPage() {
   const [filter, setFilter] = useState<'all' | 'upcoming'>('upcoming');
@@ -73,7 +74,7 @@ export default function EventsListPage() {
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   {event.image_url ? (
                     <img
-                      src={event.image_url.startsWith('http') ? event.image_url : `http://localhost:3000${event.image_url}`}
+                      src={getImageUrl(event.image_url)}
                       alt={event.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />

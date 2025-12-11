@@ -2,7 +2,17 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  mobileNumber?: string;
+  division?: string;
+  district?: string;
+  nid?: string;
+  educationStatus?: string;
   organization?: string;
+  designation?: string;
+  highestEducation?: string;
+  educationMajor?: string;
+  areaOfInterest?: string;
+  reasonToJoin?: string;
   profilePhoto?: string;
   role: 'super_admin' | 'admin' | 'content_manager' | 'editor' | 'member' | 'volunteer';
   isApproved: boolean;

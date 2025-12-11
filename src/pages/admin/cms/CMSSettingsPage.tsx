@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Settings, Save, Upload, Image } from 'lucide-react';
+import { Settings, Save, Upload } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { settingsApi } from '@/api/settings';
 import { uploadsApi } from '@/api/uploads';
 import { Loader } from '@/components/Loader';
+import { getImageUrl } from '@/utils/helpers';
 
 export const CMSSettingsPage = () => {
   const queryClient = useQueryClient();
@@ -12,14 +13,6 @@ export const CMSSettingsPage = () => {
     queryKey: ['settings'],
     queryFn: settingsApi.getSettings,
   });
-
-  const getImageUrl = (path: string | undefined) => {
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      return path;
-    }
-    return `http://localhost:3000${path}`;
-  };
 
   const [formData, setFormData] = useState({
     siteName: '',

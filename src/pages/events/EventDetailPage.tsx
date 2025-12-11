@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { eventsApi, eventRegistrationsApi } from '../../api/events-projects';
 import { useAuthStore } from '../../stores/authStore';
 import { useState, useEffect } from 'react';
+import { getImageUrl } from '../../utils/helpers';
 
 interface TimeLeft {
   days: number;
@@ -146,7 +147,7 @@ export default function EventDetailPage() {
             <div className="rounded-lg overflow-hidden bg-gray-200 h-96">
               {event.image_url ? (
                 <img
-                  src={event.image_url.startsWith('http') ? event.image_url : `http://localhost:3000${event.image_url}`}
+                  src={getImageUrl(event.image_url)}
                   alt={event.title}
                   className="w-full h-full object-cover"
                 />

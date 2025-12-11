@@ -1,5 +1,13 @@
 import { apiClient } from './client';
 
+// Helper function to ensure array responses
+const ensureArray = <T>(data: any): T[] => {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object' && Array.isArray(data.data)) return data.data;
+  console.warn('API returned non-array data:', data);
+  return [];
+};
+
 // ============================================
 // HERO SLIDERS
 // ============================================
@@ -34,8 +42,24 @@ export interface ReorderHeroSlidersDto {
 }
 
 export const heroSliderApi = {
-  getAll: () => apiClient.get<HeroSlider[]>('/cms/hero-sliders').then(res => res.data),
-  getAllActive: () => apiClient.get<HeroSlider[]>('/cms/hero-sliders/active').then(res => res.data),
+  getAll: async (): Promise<HeroSlider[]> => {
+    try {
+      const res = await apiClient.get<HeroSlider[]>('/cms/hero-sliders');
+      return ensureArray<HeroSlider>(res.data);
+    } catch (error) {
+      console.error('Error fetching hero sliders:', error);
+      return [];
+    }
+  },
+  getAllActive: async (): Promise<HeroSlider[]> => {
+    try {
+      const res = await apiClient.get<HeroSlider[]>('/cms/hero-sliders/active');
+      return ensureArray<HeroSlider>(res.data);
+    } catch (error) {
+      console.error('Error fetching active hero sliders:', error);
+      return [];
+    }
+  },
   getById: (id: number) => apiClient.get<HeroSlider>(`/cms/hero-sliders/${id}`).then(res => res.data),
   create: (data: CreateHeroSliderDto) => apiClient.post<HeroSlider>('/cms/hero-sliders', data).then(res => res.data),
   update: (id: number, data: UpdateHeroSliderDto) => apiClient.put<HeroSlider>(`/cms/hero-sliders/${id}`, data).then(res => res.data),
@@ -127,8 +151,24 @@ export interface CreateFocusAreaDto {
 export interface UpdateFocusAreaDto extends Partial<CreateFocusAreaDto> {}
 
 export const focusAreaApi = {
-  getAll: () => apiClient.get<FocusArea[]>('/cms/focus-areas').then(res => res.data),
-  getAllActive: () => apiClient.get<FocusArea[]>('/cms/focus-areas/active').then(res => res.data),
+  getAll: async (): Promise<FocusArea[]> => {
+    try {
+      const res = await apiClient.get<FocusArea[]>('/cms/focus-areas');
+      return ensureArray<FocusArea>(res.data);
+    } catch (error) {
+      console.error('Error fetching focus areas:', error);
+      return [];
+    }
+  },
+  getAllActive: async (): Promise<FocusArea[]> => {
+    try {
+      const res = await apiClient.get<FocusArea[]>('/cms/focus-areas/active');
+      return ensureArray<FocusArea>(res.data);
+    } catch (error) {
+      console.error('Error fetching active focus areas:', error);
+      return [];
+    }
+  },
   getBySlug: (slug: string) => apiClient.get<FocusArea>(`/cms/focus-areas/slug/${slug}`).then(res => res.data),
   getById: (id: number) => apiClient.get<FocusArea>(`/cms/focus-areas/${id}`).then(res => res.data),
   create: (data: CreateFocusAreaDto) => apiClient.post<FocusArea>('/cms/focus-areas', data).then(res => res.data),
@@ -163,8 +203,24 @@ export interface BulkUpdateStatisticsDto {
 }
 
 export const statisticApi = {
-  getAll: () => apiClient.get<Statistic[]>('/cms/statistics').then(res => res.data),
-  getAllActive: () => apiClient.get<Statistic[]>('/cms/statistics/active').then(res => res.data),
+  getAll: async (): Promise<Statistic[]> => {
+    try {
+      const res = await apiClient.get<Statistic[]>('/cms/statistics');
+      return ensureArray<Statistic>(res.data);
+    } catch (error) {
+      console.error('Error fetching statistics:', error);
+      return [];
+    }
+  },
+  getAllActive: async (): Promise<Statistic[]> => {
+    try {
+      const res = await apiClient.get<Statistic[]>('/cms/statistics/active');
+      return ensureArray<Statistic>(res.data);
+    } catch (error) {
+      console.error('Error fetching active statistics:', error);
+      return [];
+    }
+  },
   bulkUpdate: (data: BulkUpdateStatisticsDto) => apiClient.put<Statistic[]>('/cms/statistics', data).then(res => res.data),
 };
 

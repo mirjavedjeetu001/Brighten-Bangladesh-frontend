@@ -26,6 +26,7 @@ import { heroSliderApi, focusAreaApi, statisticApi } from '../../api/cms';
 import { blogsApi } from '../../api/blogs';
 import { eventsApi, projectsApi } from '../../api/events-projects';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import { getImageUrl } from '../../utils/helpers';
 
 // Icon mapping function
 const getIconComponent = (iconName: string) => {
@@ -317,7 +318,7 @@ export const HomePage = () => {
                     {area.image_url && (
                       <div className="h-72 overflow-hidden relative">
                         <img
-                          src={area.image_url.startsWith('http') ? area.image_url : `http://localhost:3000${area.image_url}`}
+                          src={getImageUrl(area.image_url)}
                           alt={area.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
@@ -376,7 +377,7 @@ export const HomePage = () => {
                 <div key={event.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2" style={{ animationDelay: `${index * 0.1}s` }}>
                   {event.image_url && (
                     <div className="h-56 overflow-hidden">
-                      <img src={event.image_url.startsWith('http') ? event.image_url : `http://localhost:3000${event.image_url}`} alt={event.title} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                      <img src={getImageUrl(event.image_url)} alt={event.title} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
                     </div>
                   )}
                   <div className="p-6">
@@ -422,7 +423,7 @@ export const HomePage = () => {
                 <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2" style={{ animationDelay: `${index * 0.1}s` }}>
                   {project.image_url && (
                     <div className="h-56 overflow-hidden relative">
-                      <img src={project.image_url.startsWith('http') ? project.image_url : `http://localhost:3000${project.image_url}`} alt={project.title} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                      <img src={getImageUrl(project.image_url)} alt={project.title} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
                       <div className="absolute top-4 right-4 px-3 py-1 bg-white rounded-full text-sm font-semibold text-primary-600">
                         {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                       </div>

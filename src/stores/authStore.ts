@@ -14,7 +14,7 @@ interface AuthState {
     email: string;
     password: string;
     organization?: string;
-  }) => Promise<void>;
+  }) => Promise<{ message?: string }>;
   logout: () => void;
   loadUser: () => Promise<void>;
   updateUser: (data: Partial<User>) => void;

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Edit, Trash2, Eye, EyeOff, Target, Upload } from 'lucide-react';
-import { focusAreaApi, FocusArea, CreateFocusAreaDto, UpdateFocusAreaDto } from '../../../api/cms';
+import { Plus, Edit, Trash2, Eye, EyeOff, Upload } from 'lucide-react';
+import { focusAreaApi, FocusArea, UpdateFocusAreaDto } from '../../../api/cms';
 import { uploadsApi } from '../../../api/uploads';
 import { toast } from 'react-hot-toast';
+import { getImageUrl } from '../../../utils/helpers';
 
 export const FocusAreasPage = () => {
   const queryClient = useQueryClient();
@@ -137,7 +138,7 @@ export const FocusAreasPage = () => {
             >
               {area.image_url && (
                 <img
-                  src={area.image_url.startsWith('http') ? area.image_url : `http://localhost:3000${area.image_url}`}
+                  src={getImageUrl(area.image_url)}
                   alt={area.title}
                   className="w-full h-48 object-cover"
                 />
@@ -296,7 +297,7 @@ export const FocusAreasPage = () => {
                   {imageUrl && (
                     <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-gray-200">
                       <img 
-                        src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:3000${imageUrl}`}
+                        src={getImageUrl(imageUrl)}
                         alt="Preview" 
                         className="w-full h-full object-cover"
                       />
@@ -351,7 +352,7 @@ export const FocusAreasPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={createMutation.isLoading || updateMutation.isLoading}
+                  disabled={createMutation.isPending || updateMutation.isPending}
                   className="btn btn-primary"
                 >
                   {editingArea ? 'Update' : 'Create'}

@@ -61,7 +61,7 @@ export const StatisticsPage = () => {
         </div>
         <button
           onClick={handleSave}
-          disabled={updateMutation.isLoading}
+          disabled={updateMutation.isPending}
           className="btn btn-primary flex items-center space-x-2"
         >
           <Save size={20} />

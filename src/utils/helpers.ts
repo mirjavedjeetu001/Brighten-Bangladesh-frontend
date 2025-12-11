@@ -86,3 +86,13 @@ export function isAdmin(userRole: string): boolean {
 export function canManageContent(userRole: string): boolean {
   return ['super_admin', 'admin', 'content_manager', 'editor'].includes(userRole);
 }
+
+export function getImageUrl(imageUrl: string): string {
+  if (!imageUrl) return '';
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+  const API_BASE = import.meta.env.VITE_API_URL || 'https://brightenbangladesh.com/api';
+  const baseUrl = API_BASE.replace('/api', '');
+  return `${baseUrl}${imageUrl}`;
+}

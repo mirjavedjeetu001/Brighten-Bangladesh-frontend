@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Home as HomeIcon } from 'lucide-react';
 import { focusAreaApi } from '../../api/cms';
+import { getImageUrl } from '../../utils/helpers';
 import {
   Users,
   UserCheck,
@@ -141,7 +142,7 @@ export const FocusAreaDetailPage = () => {
         <section className="container mx-auto px-6 md:px-12 max-w-5xl -mt-12 mb-16 relative z-20">
           <div className="rounded-3xl overflow-hidden shadow-2xl">
             <img
-              src={focusArea.image_url.startsWith('http') ? focusArea.image_url : `http://localhost:3000${focusArea.image_url}`}
+              src={getImageUrl(focusArea.image_url)}
               alt={focusArea.title}
               className="w-full h-[400px] md:h-[500px] object-cover"
             />

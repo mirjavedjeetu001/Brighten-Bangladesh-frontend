@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2, MessageSquare, User, Mail, Calendar, Search } from 'lucide-react';
-import { commentsApi, BlogComment } from '../../../api/comments';
+import { commentsApi } from '../../../api/comments';
+import { apiClient } from '../../../api/client';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
@@ -16,13 +17,8 @@ export const BlogCommentsPage = () => {
     queryFn: async () => {
       // For now, we'll fetch comments for all blogs
       // TODO: Create a backend endpoint to get all comments
-      const response = await fetch('http://localhost:3000/api/blogs/comments/all', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch comments');
-      return response.json();
+      const response = await apiClient.get('/blogs/comments/all');
+      return response.data;
     },
   });
 

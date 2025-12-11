@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FolderOpen, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import { projectsApi, Project, CreateProjectDto } from '../../../api/events-projects';
 import { uploadsApi } from '../../../api/uploads';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../../../utils/helpers';
 
 export const ProjectsPage = () => {
   const queryClient = useQueryClient();
@@ -143,7 +144,7 @@ export const ProjectsPage = () => {
           <div key={project.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
             <div className="flex gap-6">
               {project.image_url && (
-                <img src={project.image_url.startsWith('http') ? project.image_url : `http://localhost:3000${project.image_url}`} alt={project.title} className="w-32 h-32 object-cover rounded-lg" />
+                <img src={getImageUrl(project.image_url)} alt={project.title} className="w-32 h-32 object-cover rounded-lg" />
               )}
               <div className="flex-1">
                 <div className="flex items-start justify-between">
@@ -186,7 +187,7 @@ export const ProjectsPage = () => {
                 <div className="col-span-2"><label className="block text-sm font-medium mb-2">Slug *</label><input type="text" required value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} className="input w-full" /></div>
                 <div className="col-span-2"><label className="block text-sm font-medium mb-2">Short Description</label><textarea value={formData.short_description} onChange={(e) => setFormData({ ...formData, short_description: e.target.value })} rows={2} className="input w-full" /></div>
                 <div className="col-span-2"><label className="block text-sm font-medium mb-2">Full Description</label><textarea value={formData.full_description} onChange={(e) => setFormData({ ...formData, full_description: e.target.value })} rows={4} className="input w-full" /></div>
-                <div className="col-span-2"><label className="block text-sm font-medium mb-2">Image</label><input type="file" accept="image/*" onChange={handleFileUpload} disabled={isUploading} className="w-full" />{imageUrl && <div className="mt-2 relative w-32 h-32"><img src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:3000${imageUrl}`} alt="Preview" className="w-full h-full object-cover rounded" /><button type="button" onClick={() => setImageUrl('')} className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded"><X size={16} /></button></div>}</div>
+                <div className="col-span-2"><label className="block text-sm font-medium mb-2">Image</label><input type="file" accept="image/*" onChange={handleFileUpload} disabled={isUploading} className="w-full" />{imageUrl && <div className="mt-2 relative w-32 h-32"><img src={getImageUrl(imageUrl)} alt="Preview" className="w-full h-full object-cover rounded" /><button type="button" onClick={() => setImageUrl('')} className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded"><X size={16} /></button></div>}</div>
                 <div><label className="block text-sm font-medium mb-2">Category</label><input type="text" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="input w-full" /></div>
                 <div><label className="block text-sm font-medium mb-2">Status</label><select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as any })} className="input w-full"><option value="planning">Planning</option><option value="ongoing">Ongoing</option><option value="completed">Completed</option></select></div>
                 <div><label className="block text-sm font-medium mb-2">Start Date</label><input type="date" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} className="input w-full" /></div>

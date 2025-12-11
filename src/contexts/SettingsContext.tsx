@@ -1,6 +1,7 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { settingsApi, SystemSettings } from '@/api/settings';
+import { getImageUrl } from '@/utils/helpers';
 
 interface SettingsContextType {
   settings: SystemSettings | undefined;
@@ -15,6 +16,38 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     queryFn: settingsApi.getSettings,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
+
+  // Update favicon and title when settings change
+  useEffect(() => {
+    if (settings) {
+      // Update document title
+      if (settings.siteName) {
+        document.title = settings.siteName;
+      }
+
+      // Update favicon
+      if (settings.siteFavicon) {
+        const faviconUrl = getImageUrl(settings.siteFavicon);
+        
+        // Remove existing favicons
+        const existingLinks = document.querySelectorAll("link[rel*='icon']");
+        existingLinks.forEach(link => link.remove());
+
+        // Add new favicon
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.type = 'image/x-icon';
+        link.href = faviconUrl;
+        document.head.appendChild(link);
+
+        // Also add apple-touch-icon
+        const appleLink = document.createElement('link');
+        appleLink.rel = 'apple-touch-icon';
+        appleLink.href = faviconUrl;
+        document.head.appendChild(appleLink);
+      }
+    }
+  }, [settings]);
 
   return (
     <SettingsContext.Provider value={{ settings, isLoading }}>

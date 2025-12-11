@@ -157,7 +157,7 @@ export const HeroSlidersPage = () => {
             <button
               onClick={handleSaveOrder}
               className="btn btn-sm btn-primary flex items-center space-x-2"
-              disabled={reorderMutation.isLoading}
+              disabled={reorderMutation.isPending}
             >
               <Save size={16} />
               <span>Save Order</span>
@@ -360,7 +360,7 @@ export const HeroSlidersPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={createMutation.isLoading || updateMutation.isLoading}
+                  disabled={createMutation.isPending || updateMutation.isPending}
                   className="btn btn-primary"
                 >
                   {editingSlider ? 'Update' : 'Create'}

@@ -1,6 +1,14 @@
 import apiClient from './client';
 import { Blog, PaginatedResult } from './types';
 
+// Helper function to ensure array responses
+const ensureArray = <T>(data: any): T[] => {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object' && Array.isArray(data.data)) return data.data;
+  console.warn('API returned non-array data:', data);
+  return [];
+};
+
 export interface BlogFilters {
   page?: number;
   limit?: number;
@@ -18,10 +26,30 @@ export interface CreateBlogRequest {
 
 export const blogsApi = {
   getAll: async (filters: BlogFilters = {}): Promise<PaginatedResult<Blog>> => {
-    const response = await apiClient.get('/blogs', {
-      params: filters,
-    });
-    return response.data;
+    try {
+      const response = await apiClient.get('/blogs', {
+        params: filters,
+      });
+      const data = response.data;
+      
+      // Ensure proper structure
+      return {
+        data: ensureArray<Blog>(data?.data || data),
+        total: data?.total || 0,
+        page: data?.page || filters?.page || 1,
+        limit: data?.limit || filters?.limit || 10,
+        totalPages: data?.totalPages || 0,
+      };
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
+      return {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0,
+      };
+    }
   },
 
   getBySlug: async (slug: string): Promise<Blog> => {

@@ -3,7 +3,7 @@ import { blogsApi } from '@/api/blogs';
 import { Loader } from '@/components/Loader';
 import { Badge } from '@/components/Badge';
 import { formatDate } from '@/utils/helpers';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 export const AdminBlogsPage = () => {
   const queryClient = useQueryClient();

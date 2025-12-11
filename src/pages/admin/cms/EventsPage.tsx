@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Calendar, Plus, Edit2, Trash2, X, Upload, MapPin, Users, ExternalLink } from 'lucide-react';
+import { Calendar, Plus, Edit2, Trash2, X, MapPin, Users } from 'lucide-react';
 import { eventsApi, Event, CreateEventDto, UpdateEventDto } from '../../../api/events-projects';
 import { uploadsApi } from '../../../api/uploads';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+import { getImageUrl } from '../../../utils/helpers';
 
 export const EventsPage = () => {
   const queryClient = useQueryClient();
@@ -161,7 +162,7 @@ export const EventsPage = () => {
           <div key={event.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
             <div className="flex gap-6">
               {event.image_url && (
-                <img src={event.image_url.startsWith('http') ? event.image_url : `http://localhost:3000${event.image_url}`} alt={event.title} className="w-32 h-32 object-cover rounded-lg" />
+                <img src={getImageUrl(event.image_url)} alt={event.title} className="w-32 h-32 object-cover rounded-lg" />
               )}
               <div className="flex-1">
                 <div className="flex items-start justify-between">
@@ -223,7 +224,7 @@ export const EventsPage = () => {
                     <input type="file" accept="image/*" onChange={handleFileUpload} disabled={isUploading} className="w-full" />
                     {imageUrl && (
                       <div className="relative w-32 h-32">
-                        <img src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:3000${imageUrl}`} alt="Preview" className="w-full h-full object-cover rounded" />
+                        <img src={getImageUrl(imageUrl)} alt="Preview" className="w-full h-full object-cover rounded" />
                         <button type="button" onClick={() => setImageUrl('')} className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded"><X size={16} /></button>
                       </div>
                     )}
