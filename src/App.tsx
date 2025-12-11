@@ -25,6 +25,7 @@ import { CMSUsersPage } from './pages/admin/cms/CMSUsersPage';
 import { CMSAccessManagementPage } from './pages/admin/cms/CMSAccessManagementPage';
 import { CMSBlogsPage } from './pages/admin/cms/CMSBlogsPage';
 import { HeroSlidersPage } from './pages/admin/cms/HeroSlidersPage';
+import { AboutContentPage } from './pages/admin/cms/AboutContentPage';
 import { PagesPage } from './pages/admin/cms/PagesPage';
 import { FocusAreasPage } from './pages/admin/cms/FocusAreasPage';
 import { StatisticsPage } from './pages/admin/cms/StatisticsPage';
@@ -35,6 +36,7 @@ import { EventsPage } from './pages/admin/cms/EventsPage';
 import { ProjectsPage } from './pages/admin/cms/ProjectsPage';
 import { EventRegistrationsPage } from './pages/admin/cms/EventRegistrationsPage';
 import { ApprovedUsersPage } from './pages/admin/cms/ApprovedUsersPage';
+import { TeamMembersPage } from './pages/admin/cms/TeamMembersPage';
 import EventsListPage from './pages/events/EventsListPage';
 import EventDetailPage from './pages/events/EventDetailPage';
 import ProjectsListPage from './pages/projects/ProjectsListPage';
@@ -209,17 +211,11 @@ function App() {
             <Route path="cms/events" element={<EventsPage />} />
             <Route path="cms/event-registrations" element={<EventRegistrationsPage />} />
             <Route path="cms/projects" element={<ProjectsPage />} />
-            <Route
-              path="cms/about"
-              element={<div className="card">About Page Management (Coming Soon)</div>}
-            />
+            <Route path="cms/about" element={<AboutContentPage />} />
+            <Route path="cms/team" element={<TeamMembersPage />} />
             <Route
               path="cms/testimonials"
               element={<div className="card">Testimonials Management (Coming Soon)</div>}
-            />
-            <Route
-              path="cms/team"
-              element={<div className="card">Team Members Management (Coming Soon)</div>}
             />
             <Route
               path="cms/events"

@@ -5,7 +5,7 @@ import { Loader } from '@/components/Loader';
 import { Badge } from '@/components/Badge';
 import { CommentsSection } from '@/components/CommentsSection';
 import { formatDate } from '@/utils/helpers';
-import { ArrowLeft, User, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 
 export const BlogDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -43,7 +43,17 @@ export const BlogDetailPage = () => {
           </div>
           {blog.author && (
             <div className="flex items-center text-gray-600">
-              <User size={16} className="mr-2" />
+              <img
+                src={
+                  blog.author.profilePhoto
+                    ? (blog.author.profilePhoto.startsWith('data:image') || blog.author.profilePhoto.startsWith('http') 
+                      ? blog.author.profilePhoto 
+                      : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://brightenbangladesh.com'}${blog.author.profilePhoto}`)
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author.name)}&background=166534&color=fff&size=64`
+                }
+                alt={blog.author.name}
+                className="w-6 h-6 rounded-full object-cover mr-2 border border-gray-300"
+              />
               {blog.author.name}
             </div>
           )}
@@ -64,9 +74,17 @@ export const BlogDetailPage = () => {
           <div className="mt-12 pt-8 border-t">
             <h3 className="text-lg font-semibold mb-2">About the Author</h3>
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                <User size={32} className="text-gray-500" />
-              </div>
+              <img
+                src={
+                  blog.author.profilePhoto
+                    ? (blog.author.profilePhoto.startsWith('data:image') || blog.author.profilePhoto.startsWith('http') 
+                      ? blog.author.profilePhoto 
+                      : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://brightenbangladesh.com'}${blog.author.profilePhoto}`)
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author.name)}&background=166534&color=fff&size=128`
+                }
+                alt={blog.author.name}
+                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+              />
               <div>
                 <p className="font-medium">{blog.author.name}</p>
                 {blog.author.organization && (

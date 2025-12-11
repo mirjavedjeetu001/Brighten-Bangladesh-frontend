@@ -44,4 +44,11 @@ export const usersApi = {
     });
     return response.data;
   },
+
+  getApprovedUsers: async (): Promise<User[]> => {
+    const response = await apiClient.get('/users/approved/list', {
+      params: { page: 1, limit: 1000 },
+    });
+    return response.data.data;
+  },
 };

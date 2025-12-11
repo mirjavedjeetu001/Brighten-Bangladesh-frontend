@@ -13,7 +13,7 @@ export interface User {
   educationMajor?: string;
   areaOfInterest?: string;
   reasonToJoin?: string;
-  profilePhoto?: string;
+  profilePhoto?: string;  // TypeORM converts to camelCase in JSON
   role: 'super_admin' | 'admin' | 'content_manager' | 'editor' | 'member' | 'volunteer';
   isApproved: boolean;
   createdAt: string;

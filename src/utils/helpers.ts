@@ -89,6 +89,10 @@ export function canManageContent(userRole: string): boolean {
 
 export function getImageUrl(imageUrl: string): string {
   if (!imageUrl) return '';
+  // Handle base64 data URLs
+  if (imageUrl.startsWith('data:image')) {
+    return imageUrl;
+  }
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
   }

@@ -107,9 +107,17 @@ export const BlogsListPage = () => {
                     )}
                     {blog.author && (
                       <p className="text-sm text-gray-500 font-medium flex items-center">
-                        <span className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-2 text-primary-600 font-bold">
-                          {blog.author.name.charAt(0).toUpperCase()}
-                        </span>
+                        <img
+                          src={
+                            blog.author.profilePhoto
+                              ? (blog.author.profilePhoto.startsWith('data:image') || blog.author.profilePhoto.startsWith('http') 
+                                ? blog.author.profilePhoto 
+                                : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://brightenbangladesh.com'}${blog.author.profilePhoto}`)
+                              : `https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author.name)}&background=166534&color=fff&size=100`
+                          }
+                          alt={blog.author.name}
+                          className="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200"
+                        />
                         By {blog.author.name}
                       </p>
                     )}
