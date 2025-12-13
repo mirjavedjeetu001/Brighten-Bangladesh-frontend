@@ -32,6 +32,9 @@ export interface Blog {
   createdAt: string;
   updatedAt: string;
   author?: User;
+  viewCount?: number;
+  likesCount?: number;
+  likedByMe?: boolean;
 }
 
 export interface Magazine {

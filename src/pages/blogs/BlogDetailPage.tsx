@@ -1,20 +1,47 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { blogsApi } from '@/api/blogs';
 import { Loader } from '@/components/Loader';
 import { Badge } from '@/components/Badge';
 import { CommentsSection } from '@/components/CommentsSection';
 import { formatDate } from '@/utils/helpers';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, Eye, Heart } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 
 export const BlogDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { isAuthenticated } = useAuthStore();
+  const [likeState, setLikeState] = useState<{ likes: number; liked: boolean }>({ likes: 0, liked: false });
+  const [views, setViews] = useState<number>(0);
 
   const { data: blog, isLoading, error } = useQuery({
     queryKey: ['blog', slug],
     queryFn: () => blogsApi.getBySlug(slug!),
     enabled: !!slug,
   });
+
+  useEffect(() => {
+    if (blog) {
+      setLikeState({ likes: blog.likesCount || 0, liked: !!blog.likedByMe });
+      setViews(blog.viewCount || 0);
+      blogsApi.incrementView(blog.id).then((res) => setViews(res.views)).catch(() => {});
+    }
+  }, [blog]);
+
+  const toggleLike = async () => {
+    if (!blog) return;
+    if (!isAuthenticated) {
+      alert('Please sign in to like this blog.');
+      return;
+    }
+    try {
+      const res = await blogsApi.toggleLike(blog.id);
+      setLikeState({ likes: res.likes, liked: res.liked });
+    } catch (err) {
+      console.error('Failed to toggle like', err);
+    }
+  };
 
   if (isLoading) return <Loader />;
   if (error || !blog) return <div>Blog not found</div>;
@@ -35,12 +62,25 @@ export const BlogDetailPage = () => {
           />
         )}
 
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-6 flex-wrap">
           <Badge status={blog.status}>{blog.status}</Badge>
           <div className="flex items-center text-gray-600">
             <Calendar size={16} className="mr-2" />
             {formatDate(blog.createdAt)}
           </div>
+          <div className="flex items-center text-gray-600 gap-2">
+            <Eye size={16} />
+            <span>{views}</span>
+          </div>
+          <button
+            onClick={toggleLike}
+            className={`flex items-center gap-2 px-3 py-1 rounded-full border transition ${
+              likeState.liked ? 'border-rose-500 text-rose-600 bg-rose-50' : 'border-gray-200 text-gray-700'
+            }`}
+          >
+            <Heart size={16} fill={likeState.liked ? '#e11d48' : 'none'} />
+            <span>{likeState.likes}</span>
+          </button>
           {blog.author && (
             <div className="flex items-center text-gray-600">
               <img

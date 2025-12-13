@@ -5,6 +5,7 @@ import { MessageCircle, Trash2, Send, Share2, Facebook, Twitter, Linkedin } from
 import { commentsApi, CreateCommentDto } from '@/api/comments';
 import { useAuthStore } from '@/stores/authStore';
 import { canManageContent } from '@/utils/helpers';
+import { getImageUrl } from '@/utils/helpers';
 
 interface CommentsSectionProps {
   blogId: number;
@@ -71,13 +72,17 @@ export const CommentsSection = ({ blogId, blogSlug, blogTitle }: CommentsSection
   };
 
   const handleShare = (platform: string) => {
-    const url = `${window.location.origin}/blogs/${blogSlug}`;
-    const text = encodeURIComponent(blogTitle);
-    
+    // Use API host (with /api prefix) so share endpoint is reachable; works locally and prod
+    const apiBase = import.meta.env.VITE_API_URL || `${window.location.origin}/api`;
+    const base = apiBase.replace(/\/$/, '');
+    const shareUrl = `${base}/share/blog/${blogSlug}`;
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedText = encodeURIComponent(blogTitle);
+
     const urls: Record<string, string> = {
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-      twitter: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
     };
 
     window.open(urls[platform], '_blank', 'width=600,height=400');
@@ -182,8 +187,18 @@ export const CommentsSection = ({ blogId, blogSlug, blogTitle }: CommentsSection
               <div key={comment.id} className="bg-gray-50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                      {(comment.user?.name || comment.author_name || 'G').charAt(0).toUpperCase()}
+                    <div className="w-12 h-12 flex-shrink-0">
+                      {comment.user?.profilePhoto ? (
+                        <img
+                          src={getImageUrl(comment.user.profilePhoto)}
+                          alt={comment.user?.name || 'User'}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-primary-100 shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold text-lg">
+                          {(comment.user?.name || comment.author_name || 'G').charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">

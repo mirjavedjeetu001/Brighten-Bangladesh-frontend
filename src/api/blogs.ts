@@ -57,6 +57,16 @@ export const blogsApi = {
     return response.data;
   },
 
+  incrementView: async (id: number): Promise<{ views: number }> => {
+    const response = await apiClient.post(`/blogs/${id}/view`);
+    return response.data;
+  },
+
+  toggleLike: async (id: number): Promise<{ liked: boolean; likes: number }> => {
+    const response = await apiClient.post(`/blogs/${id}/like`);
+    return response.data;
+  },
+
   create: async (data: CreateBlogRequest): Promise<Blog> => {
     const response = await apiClient.post('/blogs', data);
     return response.data;

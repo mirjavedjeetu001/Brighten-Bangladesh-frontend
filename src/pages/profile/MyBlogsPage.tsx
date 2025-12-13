@@ -259,6 +259,8 @@ export const MyBlogsPage = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Views</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Likes</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
@@ -275,6 +277,8 @@ export const MyBlogsPage = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">{getStatusBadge(blog.status)}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{blog.viewCount ?? 0}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{blog.likesCount ?? 0}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(blog.createdAt).toLocaleDateString()}
                     </td>

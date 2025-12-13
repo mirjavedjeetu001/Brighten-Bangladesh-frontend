@@ -13,6 +13,7 @@ export interface BlogComment {
     id: number;
     name: string;
     email: string;
+    profilePhoto?: string | null;
   };
 }
 
