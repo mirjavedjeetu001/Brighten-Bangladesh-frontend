@@ -38,7 +38,7 @@ export interface CreateHeroSliderDto {
 export interface UpdateHeroSliderDto extends Partial<CreateHeroSliderDto> {}
 
 export interface ReorderHeroSlidersDto {
-  orders: { id: number; display_order: number }[];
+  order: number[];
 }
 
 export const heroSliderApi = {

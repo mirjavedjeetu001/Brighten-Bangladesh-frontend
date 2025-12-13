@@ -12,12 +12,15 @@ export interface Event {
   full_description?: string;
   image_url?: string;
   event_date: string;
+  registration_start?: string;
+  registration_deadline?: string;
   location?: string;
   organizer?: string;
   max_participants?: number;
   registration_link?: string;
   is_featured: boolean;
   is_active: boolean;
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -30,12 +33,15 @@ export interface CreateEventDto {
   full_description?: string;
   image_url?: string;
   event_date: string;
+  registration_start?: string;
+  registration_deadline?: string;
   location?: string;
   organizer?: string;
   max_participants?: number;
   registration_link?: string;
   is_featured?: boolean;
   is_active?: boolean;
+  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   display_order?: number;
 }
 

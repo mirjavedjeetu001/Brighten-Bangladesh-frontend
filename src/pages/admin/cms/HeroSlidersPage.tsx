@@ -89,11 +89,8 @@ export const HeroSlidersPage = () => {
   };
 
   const handleSaveOrder = () => {
-    const orders = sliders.map((slider, index) => ({
-      id: slider.id,
-      display_order: index + 1,
-    }));
-    reorderMutation.mutate({ orders });
+    const order = sliders.map((slider) => slider.id);
+    reorderMutation.mutate({ order });
   };
 
   const toggleActive = (slider: HeroSlider) => {

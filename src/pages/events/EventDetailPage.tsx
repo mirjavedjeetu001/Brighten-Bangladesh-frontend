@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Calendar, MapPin, Users, ExternalLink, ArrowLeft, User as UserIcon, Clock } from 'lucide-react';
+import { Calendar, MapPin, Users, ExternalLink, ArrowLeft, User as UserIcon, Clock, Ban } from 'lucide-react';
 import { format } from 'date-fns';
 import { eventsApi, eventRegistrationsApi } from '../../api/events-projects';
 import { useAuthStore } from '../../stores/authStore';
@@ -70,8 +70,8 @@ export default function EventDetailPage() {
 
     const calculateTimeLeft = () => {
       const eventDate = new Date(event.event_date).getTime();
-      const now = new Date().getTime();
-      const difference = eventDate - now;
+      const nowTs = new Date().getTime();
+      const difference = eventDate - nowTs;
 
       if (difference > 0) {
         return {
@@ -122,7 +122,18 @@ export default function EventDetailPage() {
   const currentParticipants = registrations?.filter(r => r.status === 'approved').length || 0;
   const isFull = event.max_participants ? currentParticipants >= event.max_participants : false;
   const isRegistered = userRegistration && userRegistration.status !== 'cancelled';
-  const canRegister = user && !isRegistered && !isFull;
+  const eventDate = new Date(event.event_date);
+  const registrationStart = event.registration_start ? new Date(event.registration_start) : null;
+  const registrationDeadline = event.registration_deadline ? new Date(event.registration_deadline) : null;
+  const now = new Date();
+  const isEventInPast = eventDate < now;
+  const isRegistrationClosed =
+    event.status === 'completed' ||
+    event.status === 'cancelled' ||
+    isEventInPast ||
+    !!(registrationDeadline && registrationDeadline < now);
+  const isRegistrationNotOpen = !!(registrationStart && registrationStart > now);
+  const canRegister = user && !isRegistered && !isFull && !isRegistrationClosed && !isRegistrationNotOpen;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -165,6 +176,28 @@ export default function EventDetailPage() {
                   Featured Event
                 </span>
               )}
+
+              <div className="flex items-center gap-3 mb-4">
+                <span
+                  className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                    event.status === 'completed'
+                      ? 'bg-gray-100 text-gray-700'
+                      : event.status === 'cancelled'
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-teal-100 text-teal-700'
+                  }`}
+                >
+                  {(event.status === 'completed' || isEventInPast) && 'Completed'}
+                  {event.status === 'cancelled' && 'Cancelled'}
+                  {event.status === 'upcoming' && !isEventInPast && 'Upcoming'}
+                  {event.status === 'ongoing' && !isEventInPast && 'Ongoing'}
+                </span>
+                {!event.is_active && (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600">
+                    <Ban className="w-3 h-3" /> Disabled
+                  </span>
+                )}
+              </div>
               
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 {event.title}
@@ -246,12 +279,48 @@ export default function EventDetailPage() {
                     </div>
                   </div>
                 )}
+
+                {event.registration_start && (
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-teal-600 mt-1" />
+                    <div>
+                      <div className="text-sm text-gray-500">Registration opens</div>
+                      <div className="font-medium text-gray-900">
+                        {format(new Date(event.registration_start), 'EEE, MMM dd, yyyy • hh:mm a')}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {event.registration_deadline && (
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-teal-600 mt-1" />
+                    <div>
+                      <div className="text-sm text-gray-500">Registration closes</div>
+                      <div className="font-medium text-gray-900">
+                        {format(new Date(event.registration_deadline), 'EEE, MMM dd, yyyy • hh:mm a')}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Registration Status & Actions */}
               {registrationError && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
                   {registrationError}
+                </div>
+              )}
+
+              {(isRegistrationClosed || isRegistrationNotOpen) && (
+                <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
+                  {(event.status === 'completed' || isEventInPast) && 'This event has been completed. Registration is closed.'}
+                  {event.status === 'cancelled' && 'This event was cancelled. Registration is closed.'}
+                  {registrationDeadline && registrationDeadline < now &&
+                    event.status !== 'completed' &&
+                    event.status !== 'cancelled' &&
+                    'Registration deadline has passed.'}
+                  {isRegistrationNotOpen && 'Registration has not opened yet.'}
                 </div>
               )}
 

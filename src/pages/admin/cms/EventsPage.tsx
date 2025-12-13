@@ -21,6 +21,8 @@ export const EventsPage = () => {
     full_description: '',
     image_url: '',
     event_date: '',
+    registration_start: '',
+    registration_deadline: '',
     location: '',
     organizer: '',
     max_participants: undefined,
@@ -66,7 +68,20 @@ export const EventsPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data = { ...formData, image_url: imageUrl };
+
+    const data: CreateEventDto = {
+      ...formData,
+      image_url: imageUrl || undefined,
+      short_description: formData.short_description || undefined,
+      full_description: formData.full_description || undefined,
+      location: formData.location || undefined,
+      organizer: formData.organizer || undefined,
+      registration_link: formData.registration_link || undefined,
+      registration_start: formData.registration_start || undefined,
+      registration_deadline: formData.registration_deadline || undefined,
+      max_participants: formData.max_participants || undefined,
+      display_order: formData.display_order ?? 0,
+    };
 
     if (editingEvent) {
       updateMutation.mutate({ id: editingEvent.id, data });
@@ -84,6 +99,12 @@ export const EventsPage = () => {
       full_description: event.full_description || '',
       image_url: event.image_url || '',
       event_date: event.event_date.split('T')[0] + 'T' + event.event_date.split('T')[1].substring(0, 5),
+      registration_start: event.registration_start
+        ? event.registration_start.split('T')[0] + 'T' + event.registration_start.split('T')[1].substring(0, 5)
+        : '',
+      registration_deadline: event.registration_deadline
+        ? event.registration_deadline.split('T')[0] + 'T' + event.registration_deadline.split('T')[1].substring(0, 5)
+        : '',
       location: event.location || '',
       organizer: event.organizer || '',
       max_participants: event.max_participants,
@@ -112,6 +133,8 @@ export const EventsPage = () => {
       full_description: '',
       image_url: '',
       event_date: '',
+      registration_start: '',
+      registration_deadline: '',
       location: '',
       organizer: '',
       max_participants: undefined,
@@ -177,6 +200,12 @@ export const EventsPage = () => {
                     <p className="text-gray-600 mb-3">{event.short_description}</p>
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-1"><Calendar size={16} /> {format(new Date(event.event_date), 'MMM dd, yyyy hh:mm a')}</div>
+                      {event.registration_start && (
+                        <div className="flex items-center gap-1"><Calendar size={16} /> Opens: {format(new Date(event.registration_start), 'MMM dd, yyyy hh:mm a')}</div>
+                      )}
+                      {event.registration_deadline && (
+                        <div className="flex items-center gap-1"><Calendar size={16} /> Closes: {format(new Date(event.registration_deadline), 'MMM dd, yyyy hh:mm a')}</div>
+                      )}
                       {event.location && <div className="flex items-center gap-1"><MapPin size={16} /> {event.location}</div>}
                       {event.max_participants && <div className="flex items-center gap-1"><Users size={16} /> Max: {event.max_participants}</div>}
                     </div>
@@ -233,6 +262,14 @@ export const EventsPage = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Event Date & Time *</label>
                   <input type="datetime-local" required value={formData.event_date} onChange={(e) => setFormData({ ...formData, event_date: e.target.value })} className="input w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Registration Opens</label>
+                  <input type="datetime-local" value={formData.registration_start} onChange={(e) => setFormData({ ...formData, registration_start: e.target.value })} className="input w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Registration Closes</label>
+                  <input type="datetime-local" value={formData.registration_deadline} onChange={(e) => setFormData({ ...formData, registration_deadline: e.target.value })} className="input w-full" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Location</label>
