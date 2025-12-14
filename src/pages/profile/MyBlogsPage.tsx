@@ -17,6 +17,12 @@ export const MyBlogsPage = () => {
     summary: '',
     content: '',
     coverImage: '',
+    categoryId: '',
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ['blog-categories-public'],
+    queryFn: blogsApi.getCategories,
   });
 
   const { data: blogsResponse, isLoading } = useQuery({
@@ -73,7 +79,7 @@ export const MyBlogsPage = () => {
   });
 
   const resetForm = () => {
-    setFormData({ title: '', summary: '', content: '', coverImage: '' });
+    setFormData({ title: '', summary: '', content: '', coverImage: '', categoryId: '' });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -92,6 +98,7 @@ export const MyBlogsPage = () => {
       summary: blog.summary || '',
       content: blog.content || '',
       coverImage: blog.coverImage || '',
+      categoryId: blog.categoryId ? blog.categoryId.toString() : '',
     });
     setShowCreateModal(true);
   };
@@ -349,6 +356,22 @@ export const MyBlogsPage = () => {
                   className="input"
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  value={formData.categoryId}
+                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                  className="input"
+                >
+                  <option value="">Select category</option>
+                  {categories?.map((cat) => (
+                    <option key={cat.id} value={cat.id.toString()}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>

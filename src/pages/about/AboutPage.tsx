@@ -3,6 +3,7 @@ import { aboutPageAPI } from '../../api/about';
 import { teamMemberAPI } from '../../api/team-members';
 import { Loader } from '../../components/Loader';
 import { getImageUrl } from '../../utils/helpers';
+import { SEO } from '../../components/SEO';
 
 export const AboutPage = () => {
   const { data: aboutContent, isLoading, error } = useQuery({
@@ -35,7 +36,13 @@ export const AboutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <>
+      <SEO
+        title="About Brighten Bangladesh"
+        description={aboutContent.hero_subtitle || 'Learn about Brighten Bangladesh, our mission, vision, and the team driving positive change across communities.'}
+        image={aboutContent.hero_image ? getImageUrl(aboutContent.hero_image) : undefined}
+      />
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
       <div 
         className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white overflow-hidden"
@@ -242,6 +249,7 @@ export const AboutPage = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };

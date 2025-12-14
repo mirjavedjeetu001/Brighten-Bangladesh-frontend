@@ -8,6 +8,7 @@ import { CommentsSection } from '@/components/CommentsSection';
 import { formatDate } from '@/utils/helpers';
 import { ArrowLeft, Calendar, Eye, Heart } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { SEO } from '@/components/SEO';
 
 export const BlogDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -46,8 +47,20 @@ export const BlogDetailPage = () => {
   if (isLoading) return <Loader />;
   if (error || !blog) return <div>Blog not found</div>;
 
+  const plainText = (blog.content || '').replace(/<[^>]+>/g, ' ');
+  const description = blog.summary || plainText.slice(0, 160);
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : undefined;
+
   return (
-    <div className="container mx-auto px-4 py-12">
+    <>
+      <SEO
+        title={blog.title}
+        description={description}
+        image={blog.coverImage}
+        url={pageUrl}
+        type="article"
+      />
+      <div className="container mx-auto px-4 py-12">
       <Link to="/blogs" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6">
         <ArrowLeft size={20} className="mr-2" />
         Back to Blogs
@@ -144,6 +157,7 @@ export const BlogDetailPage = () => {
           />
         </div>
       </article>
-    </div>
+      </div>
+    </>
   );
 };

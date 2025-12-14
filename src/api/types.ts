@@ -36,6 +36,17 @@ export interface Blog {
   viewCount?: number;
   likesCount?: number;
   likedByMe?: boolean;
+  categoryId?: number;
+  category?: BlogCategory;
+}
+
+export interface BlogCategory {
+  id: number;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Magazine {

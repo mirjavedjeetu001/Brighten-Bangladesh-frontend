@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { Blog, PaginatedResult } from './types';
+import { Blog, BlogCategory, PaginatedResult } from './types';
 
 // Helper function to ensure array responses
 const ensureArray = <T>(data: any): T[] => {
@@ -15,6 +15,7 @@ export interface BlogFilters {
   search?: string;
   status?: string;
   authorId?: string;
+  categoryId?: string;
 }
 
 export interface CreateBlogRequest {
@@ -22,6 +23,7 @@ export interface CreateBlogRequest {
   coverImage?: string;
   summary?: string;
   content: string;
+  categoryId?: number | string;
 }
 
 export const blogsApi = {
@@ -94,5 +96,30 @@ export const blogsApi = {
 
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/blogs/${id}`);
+  },
+
+  // Categories
+  getCategories: async (): Promise<BlogCategory[]> => {
+    const response = await apiClient.get('/blog-categories');
+    return response.data;
+  },
+
+  getAllCategoriesAdmin: async (): Promise<BlogCategory[]> => {
+    const response = await apiClient.get('/blog-categories/all');
+    return response.data;
+  },
+
+  createCategory: async (name: string): Promise<BlogCategory> => {
+    const response = await apiClient.post('/blog-categories', { name });
+    return response.data;
+  },
+
+  updateCategory: async (id: number, payload: Partial<BlogCategory>): Promise<BlogCategory> => {
+    const response = await apiClient.put(`/blog-categories/${id}`, payload);
+    return response.data;
+  },
+
+  deleteCategory: async (id: number): Promise<void> => {
+    await apiClient.delete(`/blog-categories/${id}`);
   },
 };

@@ -27,6 +27,7 @@ import { blogsApi } from '../../api/blogs';
 import { eventsApi, projectsApi } from '../../api/events-projects';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { getImageUrl } from '../../utils/helpers';
+import { SEO } from '../../components/SEO';
 
 // Icon mapping function
 const getIconComponent = (iconName: string) => {
@@ -133,7 +134,13 @@ export const HomePage = () => {
   };
 
   return (
-    <div className="bg-white">
+    <>
+      <SEO
+        title="Brighten Bangladesh"
+        description="Brighten Bangladesh empowers communities across the nation through education, collaboration, events, projects, and inspiring stories."
+        image={heroSliders && heroSliders.length > 0 ? heroSliders[0]?.image_url : undefined}
+      />
+      <div className="bg-white">
       {/* Hero Slider Section */}
       <section className="relative h-[650px] md:h-[700px] overflow-hidden">
         {heroSliders && heroSliders.length > 0 ? (
@@ -643,6 +650,7 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 };

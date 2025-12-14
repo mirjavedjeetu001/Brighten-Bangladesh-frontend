@@ -6,15 +6,22 @@ import { Loader } from '@/components/Loader';
 import { Badge } from '@/components/Badge';
 import { formatDate, truncateText } from '@/utils/helpers';
 import { Search } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 export const BlogsListPage = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [categoryId, setCategoryId] = useState<string>('');
 
   const { data: blogsResponse, isLoading, error } = useQuery({
-    queryKey: ['blogs', page, search],
-    queryFn: () => blogsApi.getAll({ page, limit: 9, search, status: 'published' }),
+    queryKey: ['blogs', page, search, categoryId],
+    queryFn: () => blogsApi.getAll({ page, limit: 9, search, status: 'published', categoryId: categoryId || undefined }),
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ['blog-categories-public'],
+    queryFn: blogsApi.getCategories,
   });
 
   const blogs = blogsResponse?.data || [];
@@ -39,7 +46,12 @@ export const BlogsListPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
+    <>
+      <SEO
+        title="Blogs and Articles"
+        description="Explore published blogs and articles from the Brighten Bangladesh community across education, projects, and impact stories."
+      />
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
       {/* Header Section with Premium Spacing */}
       <div className="bg-gradient-to-br from-primary-50 via-white to-accent-50 pt-20 pb-16">
         <div className="container mx-auto px-6 md:px-12 lg:px-16 max-w-7xl">
@@ -65,10 +77,61 @@ export const BlogsListPage = () => {
                   onChange={(e) => setSearchInput(e.target.value)}
                 />
               </div>
+              <div className="flex-1">
+                <select
+                  value={categoryId}
+                  onChange={(e) => {
+                    setCategoryId(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full px-4 py-5 rounded-2xl border-2 border-gray-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all duration-300 text-lg shadow-sm hover:shadow-md"
+                >
+                  <option value="">All categories</option>
+                  {categories?.map((cat) => (
+                    <option key={cat.id} value={cat.id.toString()}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <button type="submit" className="btn btn-primary px-10 py-5 text-lg font-bold rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                 Search
               </button>
             </form>
+
+            {categories && categories.length > 0 && (
+              <div className="mt-10 flex flex-wrap justify-center gap-3">
+                <button
+                  onClick={() => {
+                    setCategoryId('');
+                    setPage(1);
+                  }}
+                  className={`px-4 py-2 rounded-full border text-sm font-semibold transition ${
+                    categoryId === ''
+                      ? 'bg-primary-600 text-white border-primary-600'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-primary-500'
+                  }`}
+                >
+                  All
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setCategoryId(cat.id.toString());
+                      setPage(1);
+                    }}
+                    className={`px-4 py-2 rounded-full border text-sm font-semibold transition ${
+                      categoryId === cat.id.toString()
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'bg-white text-gray-700 border-gray-200 hover:border-primary-500'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -95,10 +158,17 @@ export const BlogsListPage = () => {
                     </div>
                   )}
                   <div className="p-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge status={blog.status}>{blog.status}</Badge>
-                      <span className="text-sm text-gray-500 font-medium">{formatDate(blog.createdAt)}</span>
-                    </div>
+                      <div className="flex items-center justify-between mb-3">
+                        <Badge status={blog.status}>{blog.status}</Badge>
+                        <div className="flex items-center gap-3 text-sm text-gray-500 font-medium">
+                          {blog.category?.name && (
+                            <span className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-xs font-semibold">
+                              {blog.category.name}
+                            </span>
+                          )}
+                          <span>{formatDate(blog.createdAt)}</span>
+                        </div>
+                      </div>
                     <h2 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-primary-600 transition-colors duration-300 line-clamp-2">
                       {blog.title}
                     </h2>
@@ -158,6 +228,7 @@ export const BlogsListPage = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };

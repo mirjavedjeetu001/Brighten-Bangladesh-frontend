@@ -8,10 +8,16 @@ export const CMSBlogsPage = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<any>(null);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   const { data: blogs, isLoading } = useQuery({
     queryKey: ['blogs-cms'],
     queryFn: () => blogsApi.getAll({}),
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ['blog-categories-admin'],
+    queryFn: blogsApi.getAllCategoriesAdmin,
   });
 
   const createMutation = useMutation({
@@ -63,6 +69,54 @@ export const CMSBlogsPage = () => {
     onError: () => toast.error('Failed to publish blog'),
   });
 
+  const createCategoryMutation = useMutation({
+    mutationFn: blogsApi.createCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blog-categories-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-categories-public'] });
+      setNewCategoryName('');
+      toast.success('Category created');
+    },
+    onError: (error: any) => toast.error(error.response?.data?.message || 'Failed to create category'),
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: any }) => blogsApi.updateCategory(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blog-categories-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-categories-public'] });
+      toast.success('Category updated');
+    },
+    onError: (error: any) => toast.error(error.response?.data?.message || 'Failed to update category'),
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: blogsApi.deleteCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blog-categories-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-categories-public'] });
+      toast.success('Category deleted');
+    },
+    onError: (error: any) => toast.error(error.response?.data?.message || 'Failed to delete category'),
+  });
+
+  const handleToggleCategory = (category: any) => {
+    updateCategoryMutation.mutate({ id: category.id, payload: { isActive: !category.isActive } });
+  };
+
+  const handleRenameCategory = (category: any) => {
+    const newName = prompt('Update category name', category.name);
+    const trimmed = newName?.trim();
+    if (!trimmed || trimmed === category.name) return;
+    updateCategoryMutation.mutate({ id: category.id, payload: { name: trimmed } });
+  };
+
+  const handleDeleteCategory = (id: number) => {
+    if (confirm('Delete this category? Blogs using it will be uncategorized.')) {
+      deleteCategoryMutation.mutate(id);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -73,6 +127,7 @@ export const CMSBlogsPage = () => {
       summary: formData.get('summary') as string || undefined,
       coverImage: formData.get('coverImage') as string || undefined,
       status: formData.get('status') as string || undefined,
+      categoryId: formData.get('categoryId') as string || undefined,
     };
 
     if (editingBlog) {
@@ -138,6 +193,101 @@ export const CMSBlogsPage = () => {
           <Plus size={20} />
           <span>Create Blog</span>
         </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-4 border border-gray-100">
+        <form
+          className="flex gap-3 items-center"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!newCategoryName.trim()) return;
+            createCategoryMutation.mutate(newCategoryName.trim());
+          }}
+        >
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Add Category</label>
+            <input
+              type="text"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              className="input w-full"
+              placeholder="Category name"
+            />
+          </div>
+          <button type="submit" className="btn btn-primary mt-6" disabled={createCategoryMutation.isPending}>
+            Add
+          </button>
+        </form>
+
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold text-gray-900">Manage Categories</h3>
+            <span className="text-sm text-gray-500">{categories?.length || 0} total</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left px-3 py-2 text-gray-600 font-semibold">Name</th>
+                  <th className="text-left px-3 py-2 text-gray-600 font-semibold">Slug</th>
+                  <th className="text-left px-3 py-2 text-gray-600 font-semibold">Status</th>
+                  <th className="text-right px-3 py-2 text-gray-600 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {categories && categories.length > 0 ? (
+                  categories.map((cat: any) => (
+                    <tr key={cat.id}>
+                      <td className="px-3 py-2 font-medium text-gray-900">{cat.name}</td>
+                      <td className="px-3 py-2 text-gray-500">{cat.slug}</td>
+                      <td className="px-3 py-2">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            cat.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {cat.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-right space-x-2 whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleCategory(cat)}
+                          disabled={updateCategoryMutation.isPending}
+                          className="px-3 py-1 text-xs rounded-md border border-gray-200 hover:bg-gray-50"
+                        >
+                          {cat.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRenameCategory(cat)}
+                          disabled={updateCategoryMutation.isPending}
+                          className="px-3 py-1 text-xs rounded-md border border-blue-200 text-blue-600 hover:bg-blue-50"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCategory(cat.id)}
+                          disabled={deleteCategoryMutation.isPending}
+                          className="px-3 py-1 text-xs rounded-md border border-red-200 text-red-600 hover:bg-red-50"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td className="px-3 py-4 text-gray-500" colSpan={4}>
+                      No categories yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       {/* Stats */}
@@ -219,7 +369,7 @@ export const CMSBlogsPage = () => {
                       <>
                         <span>•</span>
                         <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                          {blog.category}
+                          {blog.category?.name || 'Uncategorized'}
                         </span>
                       </>
                     )}
@@ -374,6 +524,22 @@ export const CMSBlogsPage = () => {
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="published">Published</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <select
+                    name="categoryId"
+                    defaultValue={editingBlog?.categoryId || ''}
+                    className="input w-full"
+                  >
+                    <option value="">Select category</option>
+                    {categories?.map((cat: any) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
