@@ -16,6 +16,7 @@ export interface User {
   profilePhoto?: string;  // TypeORM converts to camelCase in JSON
   role: 'super_admin' | 'admin' | 'content_manager' | 'editor' | 'member' | 'volunteer';
   isApproved: boolean;
+  isEmailVerified: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -100,11 +101,46 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
+  mobileNumber: string;
+  division: string;
+  district: string;
+  nid: string;
+  educationStatus: string;
+  highestEducation: string;
+  educationMajor: string;
+  areaOfInterest: string;
   organization?: string;
+  designation?: string;
+  reasonToJoin?: string;
   profilePhoto?: string;
 }
 
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface RegisterResponse {
+  user?: User;
+  message: string;
+  requiresEmailVerification?: boolean;
+}
+
+export interface VerifyOtpRequest {
+  email: string;
+  otp: string;
+}
+
+export interface BasicMessageResponse {
+  message: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  otp: string;
+  newPassword: string;
 }

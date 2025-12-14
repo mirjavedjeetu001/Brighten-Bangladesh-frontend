@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { Alert } from '@/components/Alert';
 import { Upload, X } from 'lucide-react';
+import { authApi } from '@/api/auth';
 
 export const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -27,6 +28,14 @@ export const RegisterPage = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [otpMessage, setOtpMessage] = useState('');
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
 
   const { register } = useAuthStore();
   const navigate = useNavigate();
@@ -130,26 +139,63 @@ export const RegisterPage = () => {
 
     try {
       const { confirmPassword, agreedToTerms, ...registerData } = formData;
-      const response = await register(registerData);
-      
-      // Check if user needs approval
-      if (response.message) {
-        // Show success message and redirect to login
-        navigate('/login', { 
-          state: { 
-            message: response.message,
-            type: 'info'
-          } 
-        });
-      } else {
-        // User approved immediately, go to profile
-        navigate('/profile');
-      }
+      await register(registerData);
+
+      setPendingEmail(registerData.email);
+      setShowOtpModal(true);
+      setOtpVerified(false);
+      setOtpCode('');
+      setOtpError('');
+      setOtpMessage('');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVerifyOtp = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    setOtpError('');
+    setOtpMessage('');
+    setIsVerifyingOtp(true);
+
+    try {
+      const response = await authApi.verifyOtp({ email: pendingEmail, otp: otpCode });
+      setOtpVerified(true);
+      setOtpMessage(response.message || 'Email verified successfully.');
+    } catch (err: any) {
+      setOtpError(err.response?.data?.message || 'OTP verification failed');
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setOtpError('');
+    setOtpMessage('');
+    setIsResendingOtp(true);
+
+    try {
+      const response = await authApi.resendOtp(pendingEmail);
+      setOtpMessage(response.message || 'A new code has been sent to your email.');
+    } catch (err: any) {
+      setOtpError(err.response?.data?.message || 'Could not resend code');
+    } finally {
+      setIsResendingOtp(false);
+    }
+  };
+
+  const goToLoginWithReviewNote = () => {
+    navigate('/login', {
+      state: {
+        message: 'Email verified. Your application is under review. Admin will approve within 8 hours and you will receive an email once approved.',
+        type: 'info',
+      },
+    });
   };
 
   return (
@@ -496,6 +542,80 @@ export const RegisterPage = () => {
           </div>
         </form>
       </div>
+
+      {showOtpModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6 relative">
+            <button
+              type="button"
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+              onClick={() => setShowOtpModal(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Verify your email</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              We sent a 6-digit code to <span className="font-semibold">{pendingEmail || formData.email}</span>. Enter it below to confirm your registration.
+            </p>
+
+            {otpMessage && <Alert type={otpVerified ? 'success' : 'info'} message={otpMessage} />}
+            {otpError && <Alert type="error" message={otpError} onClose={() => setOtpError('')} />}
+
+            {otpVerified ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-700">
+                  Your application is under review. Admin will approve within 8 hours. You will receive an email once it is approved.
+                </p>
+                <button
+                  type="button"
+                  onClick={goToLoginWithReviewNote}
+                  className="w-full btn btn-primary"
+                >
+                  Go to Login
+                </button>
+              </div>
+            ) : (
+              <form className="space-y-4" onSubmit={handleVerifyOtp}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Enter 6-digit code</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    className="input tracking-widest text-center"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isVerifyingOtp}
+                  className="w-full btn btn-primary disabled:opacity-50"
+                >
+                  {isVerifyingOtp ? 'Verifying...' : 'Verify & Continue'}
+                </button>
+
+                <button
+                  type="button"
+                  className="w-full btn bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
+                  onClick={handleResendOtp}
+                  disabled={isResendingOtp}
+                >
+                  {isResendingOtp ? 'Resending...' : 'Resend code'}
+                </button>
+
+                <p className="text-xs text-gray-500 text-center">
+                  After verification, your application stays under review. Admin will approve within 8 hours and you will receive an email notification.
+                </p>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { User } from '@/api/types';
 import { authApi } from '@/api/auth';
 import { usersApi } from '@/api/users';
+import { RegisterRequest, RegisterResponse } from '@/api/types';
 
 interface AuthState {
   user: User | null;
@@ -9,12 +10,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: {
-    name: string;
-    email: string;
-    password: string;
-    organization?: string;
-  }) => Promise<{ message?: string }>;
+  register: (data: RegisterRequest) => Promise<RegisterResponse>;
   logout: () => void;
   loadUser: () => Promise<void>;
   updateUser: (data: Partial<User>) => void;
@@ -51,22 +47,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: true });
       const response = await authApi.register(data);
       
-      // If user needs approval, don't set token or login
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        
-        set({
-          user: response.user,
-          token: response.token,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-      } else {
-        // User needs approval - don't login
-        set({ isLoading: false });
-      }
-      
+      set({ isLoading: false });
+
       return response;
     } catch (error) {
       set({ isLoading: false });
