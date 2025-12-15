@@ -1,9 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, User, FileText, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { useSettings } from '@/contexts/SettingsContext';
 import { canManageContent, getImageUrl } from '@/utils/helpers';
+import { navigationMenusApi } from '@/api/menus';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,6 +14,12 @@ export const Header = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { settings } = useSettings();
   const navigate = useNavigate();
+
+  // Fetch active navigation menus
+  const { data: menuItems = [] } = useQuery({
+    queryKey: ['navigation-menus'],
+    queryFn: navigationMenusApi.getAll,
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,30 +59,16 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6 xl:gap-8 flex-1 justify-end">
-            <Link to="/" className="text-gray-700 hover:text-primary-600 font-medium text-sm xl:text-base transition-colors duration-200 relative group">
-              <span>Home</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link to="/about" className="text-gray-700 hover:text-primary-600 font-medium text-sm xl:text-base transition-colors duration-200 relative group">
-              <span>About</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link to="/blogs" className="text-gray-700 hover:text-primary-600 font-medium text-sm xl:text-base transition-colors duration-200 relative group">
-              <span>Blogs & Articles</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link to="/events" className="text-gray-700 hover:text-primary-600 font-medium text-sm xl:text-base transition-colors duration-200 relative group">
-              <span>Events</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link to="/projects" className="text-gray-700 hover:text-primary-600 font-medium text-sm xl:text-base transition-colors duration-200 relative group">
-              <span>Projects</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link to="/magazines" className="text-gray-700 hover:text-primary-600 font-medium text-sm xl:text-base transition-colors duration-200 relative group">
-              <span>Magazines</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
+            {menuItems.map((menu) => (
+              <Link 
+                key={menu.id} 
+                to={menu.path} 
+                className="text-gray-700 hover:text-primary-600 font-medium text-sm xl:text-base transition-colors duration-200 relative group"
+              >
+                <span>{menu.label}</span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            ))}
 
             {isAuthenticated ? (
               <div className="relative ml-2" ref={profileMenuRef}>
@@ -154,48 +148,16 @@ export const Header = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 space-y-1 border-t border-gray-100 pt-4">
-            <Link
-              to="/"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2.5 px-4 rounded-lg hover:bg-primary-50 transition-all duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="/about"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2.5 px-4 rounded-lg hover:bg-primary-50 transition-all duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              to="/blogs"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2.5 px-4 rounded-lg hover:bg-primary-50 transition-all duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Blogs & Articles
-            </Link>
-            <Link
-              to="/events"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2.5 px-4 rounded-lg hover:bg-primary-50 transition-all duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Events
-            </Link>
-            <Link
-              to="/projects"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2.5 px-4 rounded-lg hover:bg-primary-50 transition-all duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Projects
-            </Link>
-            <Link
-              to="/magazines"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2.5 px-4 rounded-lg hover:bg-primary-50 transition-all duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Magazines
-            </Link>
+            {menuItems.map((menu) => (
+              <Link
+                key={menu.id}
+                to={menu.path}
+                className="block text-gray-700 hover:text-primary-600 font-medium py-2.5 px-4 rounded-lg hover:bg-primary-50 transition-all duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {menu.label}
+              </Link>
+            ))}
 
             {isAuthenticated ? (
               <>

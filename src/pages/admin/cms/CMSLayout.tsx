@@ -15,6 +15,7 @@ import {
   Home,
   User,
   Shield,
+  Menu as MenuIcon,
 } from 'lucide-react';
 import { useAuthStore } from '../../../stores/authStore';
 
@@ -41,6 +42,8 @@ export const CMSLayout = () => {
     { name: 'Events', href: '/admin/cms/events', icon: Calendar },
     { name: 'Event Registrations', href: '/admin/cms/event-registrations', icon: Users },
     { name: 'Projects', href: '/admin/cms/projects', icon: FolderOpen },
+    { name: 'Job Portal', href: '/admin/cms/jobs', icon: FileText },
+    { name: 'Navigation Menus', href: '/admin/cms/menus', icon: MenuIcon },
     { name: 'Statistics', href: '/admin/cms/statistics', icon: BarChart3 },
     { name: 'Contact Submissions', href: '/admin/cms/contact', icon: Mail },
     { name: 'Settings', href: '/admin/cms/settings', icon: Settings },

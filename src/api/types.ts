@@ -49,6 +49,19 @@ export interface BlogCategory {
   updatedAt: string;
 }
 
+export interface NavigationMenu {
+  id: number;
+  name: string;
+  label: string;
+  path: string;
+  isActive: boolean;
+  displayOrder: number;
+  isSystem: boolean;
+  icon?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Magazine {
   id: number;
   title: string;
@@ -154,4 +167,31 @@ export interface ResetPasswordRequest {
   email: string;
   otp: string;
   newPassword: string;
+}
+
+export interface JobCategory {
+  id: number;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  displayOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Job {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string;
+  company?: string;
+  location?: string;
+  jobType?: string;
+  categoryId?: number;
+  category?: JobCategory;
+  applyLink: string;
+  deadline?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

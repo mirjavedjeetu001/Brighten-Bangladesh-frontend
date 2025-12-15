@@ -41,6 +41,10 @@ import EventsListPage from './pages/events/EventsListPage';
 import EventDetailPage from './pages/events/EventDetailPage';
 import ProjectsListPage from './pages/projects/ProjectsListPage';
 import ProjectDetailPage from './pages/projects/ProjectDetailPage';
+import { JobsListPage } from './pages/jobs/JobsListPage';
+import { JobDetailPage } from './pages/jobs/JobDetailPage';
+import { CMSJobsPage } from './pages/admin/cms/CMSJobsPage';
+import CMSMenusPage from './pages/admin/cms/CMSMenusPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -163,6 +167,22 @@ function App() {
               </Layout>
             }
           />
+          <Route
+            path="/jobs"
+            element={
+              <Layout>
+                <JobsListPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/jobs/:slug"
+            element={
+              <Layout>
+                <JobDetailPage />
+              </Layout>
+            }
+          />
 
           {/* Protected routes */}
           <Route
@@ -213,6 +233,7 @@ function App() {
             <Route path="cms/projects" element={<ProjectsPage />} />
             <Route path="cms/about" element={<AboutContentPage />} />
             <Route path="cms/team" element={<TeamMembersPage />} />
+            <Route path="cms/jobs" element={<CMSJobsPage />} />
             <Route
               path="cms/testimonials"
               element={<div className="card">Testimonials Management (Coming Soon)</div>}
@@ -225,10 +246,7 @@ function App() {
               path="cms/projects"
               element={<div className="card">Projects Management (Coming Soon)</div>}
             />
-            <Route
-              path="cms/menus"
-              element={<div className="card">Menus Management (Coming Soon)</div>}
-            />
+            <Route path="cms/menus" element={<CMSMenusPage />} />
             <Route
               path="cms/settings"
               element={<CMSSettingsPage />}
