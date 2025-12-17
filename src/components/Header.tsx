@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User, FileText, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
+import { Menu, X, LogOut, User, FileText, Settings as SettingsIcon, ChevronDown, Briefcase } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
@@ -98,6 +98,14 @@ export const Header = () => {
                     >
                       <FileText size={18} />
                       <span>My Blogs</span>
+                    </Link>
+                    <Link
+                      to="/cv-maker"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                    >
+                      <Briefcase size={18} />
+                      <span>CV Maker</span>
                     </Link>
                     {user && canManageContent(user.role) && (
                       <Link

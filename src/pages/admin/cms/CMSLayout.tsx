@@ -31,6 +31,7 @@ export const CMSLayout = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin/cms', icon: LayoutDashboard, end: true },
+    { name: 'CV Analytics', href: '/admin/cms/dashboard', icon: BarChart3 },
     { name: 'User Approvals', href: '/admin/cms/users', icon: Users },
     { name: 'Approved Members', href: '/admin/cms/approved-users', icon: Users },
     { name: 'Access Management', href: '/admin/cms/access-management', icon: Shield },
@@ -43,6 +44,8 @@ export const CMSLayout = () => {
     { name: 'Event Registrations', href: '/admin/cms/event-registrations', icon: Users },
     { name: 'Projects', href: '/admin/cms/projects', icon: FolderOpen },
     { name: 'Job Portal', href: '/admin/cms/jobs', icon: FileText },
+    { name: 'CV Templates', href: '/admin/cms/cv-templates', icon: FileText },
+    { name: 'User CVs', href: '/admin/cms/user-cvs', icon: FileText },
     { name: 'Navigation Menus', href: '/admin/cms/menus', icon: MenuIcon },
     { name: 'Statistics', href: '/admin/cms/statistics', icon: BarChart3 },
     { name: 'Contact Submissions', href: '/admin/cms/contact', icon: Mail },

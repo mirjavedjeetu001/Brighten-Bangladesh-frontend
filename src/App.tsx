@@ -7,6 +7,7 @@ import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { Preloader } from './components/Preloader';
+import { usePageViewTracking } from './hooks/usePageViewTracking';
 
 // Pages
 import { HomePage } from './pages/home/HomePage';
@@ -45,6 +46,12 @@ import { JobsListPage } from './pages/jobs/JobsListPage';
 import { JobDetailPage } from './pages/jobs/JobDetailPage';
 import { CMSJobsPage } from './pages/admin/cms/CMSJobsPage';
 import CMSMenusPage from './pages/admin/cms/CMSMenusPage';
+import { CvMakerPage } from './pages/cv-maker/CvMakerPage';
+import { CreateCvPage } from './pages/cv-maker/CreateCvPage';
+import { CvPreviewPage } from './pages/cv-maker/CvPreviewPage';
+import { CMSCvTemplatesPage } from './pages/cms/CMSCvTemplatesPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { CMSUserCvsPage } from './pages/admin/cms/CMSUserCvsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,36 +62,15 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
-  const { loadUser, isAuthenticated } = useAuthStore();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadUser();
-    }
-    
-    // Show preloader for 1.5 seconds
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return <Preloader />;
-  }
-
+// Wrapper component to use tracking hook inside BrowserRouter
+function AppRoutes() {
+  usePageViewTracking();
+  
   return (
-    <QueryClientProvider client={queryClient}>
-      <SettingsProvider>
-        <Toaster position="top-right" />
-        <BrowserRouter>
-          <Routes>
-          {/* Auth routes without layout */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+    <Routes>
+      {/* Auth routes without layout */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
           {/* Public routes with layout */}
           <Route
@@ -207,6 +193,48 @@ function App() {
             }
           />
 
+          {/* CV Maker Routes */}
+          <Route
+            path="/cv-maker"
+            element={
+              <Layout>
+                <ProtectedRoute allowedRoles={['member', 'volunteer', 'editor', 'admin', 'super_admin']}>
+                  <CvMakerPage />
+                </ProtectedRoute>
+              </Layout>
+            }
+          />
+          <Route
+            path="/cv-maker/create"
+            element={
+              <Layout>
+                <ProtectedRoute allowedRoles={['member', 'volunteer', 'editor', 'admin', 'super_admin']}>
+                  <CreateCvPage />
+                </ProtectedRoute>
+              </Layout>
+            }
+          />
+          <Route
+            path="/cv-maker/:id/edit"
+            element={
+              <Layout>
+                <ProtectedRoute allowedRoles={['member', 'volunteer', 'editor', 'admin', 'super_admin']}>
+                  <CreateCvPage />
+                </ProtectedRoute>
+              </Layout>
+            }
+          />
+          <Route
+            path="/cv-maker/:id/preview"
+            element={
+              <Layout>
+                <ProtectedRoute allowedRoles={['member', 'volunteer', 'editor', 'admin', 'super_admin']}>
+                  <CvPreviewPage />
+                </ProtectedRoute>
+              </Layout>
+            }
+          />
+
           {/* CMS Admin Panel - All admin features in one place */}
           <Route
             path="/admin"
@@ -218,6 +246,7 @@ function App() {
           >
             <Route index element={<Navigate to="/admin/cms" replace />} />
             <Route path="cms" element={<CMSDashboard />} />
+            <Route path="cms/dashboard" element={<DashboardPage />} />
             <Route path="cms/users" element={<CMSUsersPage />} />
             <Route path="cms/approved-users" element={<ApprovedUsersPage />} />
             <Route path="cms/access-management" element={<CMSAccessManagementPage />} />
@@ -234,6 +263,8 @@ function App() {
             <Route path="cms/about" element={<AboutContentPage />} />
             <Route path="cms/team" element={<TeamMembersPage />} />
             <Route path="cms/jobs" element={<CMSJobsPage />} />
+            <Route path="cms/cv-templates" element={<CMSCvTemplatesPage />} />
+            <Route path="cms/user-cvs" element={<CMSUserCvsPage />} />
             <Route
               path="cms/testimonials"
               element={<div className="card">Testimonials Management (Coming Soon)</div>}
@@ -278,7 +309,37 @@ function App() {
               </Layout>
             }
           />
-          </Routes>
+    </Routes>
+  );
+}
+
+function App() {
+  const { loadUser, isAuthenticated } = useAuthStore();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadUser();
+    }
+    
+    // Show preloader for 1.5 seconds
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Preloader />;
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SettingsProvider>
+        <Toaster position="top-right" />
+        <BrowserRouter>
+          <AppRoutes />
         </BrowserRouter>
       </SettingsProvider>
     </QueryClientProvider>
