@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { MessageCircle, Trash2, Send, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { MessageCircle, Trash2, Send, Share2, Link as LinkIcon } from 'lucide-react';
 import { commentsApi, CreateCommentDto } from '@/api/comments';
 import { useAuthStore } from '@/stores/authStore';
 import { canManageContent } from '@/utils/helpers';
@@ -10,10 +10,10 @@ import { getImageUrl } from '@/utils/helpers';
 interface CommentsSectionProps {
   blogId: number;
   blogSlug: string;
-  blogTitle: string;
+  blogTitle?: string;
 }
 
-export const CommentsSection = ({ blogId, blogSlug, blogTitle }: CommentsSectionProps) => {
+export const CommentsSection = ({ blogId, blogSlug }: CommentsSectionProps) => {
   const { user, isAuthenticated } = useAuthStore();
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
@@ -71,21 +71,15 @@ export const CommentsSection = ({ blogId, blogSlug, blogTitle }: CommentsSection
     createMutation.mutate(data);
   };
 
-  const handleShare = (platform: string) => {
-    // Use API host (with /api prefix) so share endpoint is reachable; works locally and prod
-    const apiBase = import.meta.env.VITE_API_URL || `${window.location.origin}/api`;
-    const base = apiBase.replace(/\/$/, '');
-    const shareUrl = `${base}/share/blog/${blogSlug}`;
-    const encodedUrl = encodeURIComponent(shareUrl);
-    const encodedText = encodeURIComponent(blogTitle);
+  const getShareUrl = () => {
+    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://brightenbangladesh.com';
+    return `${baseUrl}/share.php?slug=${blogSlug}`;
+  };
 
-    const urls: Record<string, string> = {
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-      twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-    };
-
-    window.open(urls[platform], '_blank', 'width=600,height=400');
+  const copyLink = () => {
+    const shareUrl = getShareUrl();
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('Link copied to clipboard!');
   };
 
   const canDelete = user && canManageContent(user.role);
@@ -99,27 +93,13 @@ export const CommentsSection = ({ blogId, blogSlug, blogTitle }: CommentsSection
             <Share2 className="text-primary-600" size={28} />
             <h3 className="text-xl font-bold text-gray-900">Share this article</h3>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <button
-              onClick={() => handleShare('facebook')}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-md"
+              onClick={copyLink}
+              className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-md"
             >
-              <Facebook size={20} />
-              <span>Facebook</span>
-            </button>
-            <button
-              onClick={() => handleShare('twitter')}
-              className="flex items-center gap-2 px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-md"
-            >
-              <Twitter size={20} />
-              <span>Twitter</span>
-            </button>
-            <button
-              onClick={() => handleShare('linkedin')}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-md"
-            >
-              <Linkedin size={20} />
-              <span>LinkedIn</span>
+              <LinkIcon size={20} />
+              <span>Copy Link</span>
             </button>
           </div>
         </div>
